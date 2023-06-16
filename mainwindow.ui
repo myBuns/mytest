@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="currentIndex">
+       <number>-1</number>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menufiel">
+    <property name="title">
+     <string>文件</string>
+    </property>
+    <addaction name="newfile"/>
+    <addaction name="separator"/>
+    <addaction name="open"/>
+    <addaction name="save"/>
+    <addaction name="closeTab"/>
+   </widget>
+   <addaction name="menufiel"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="newfile">
+   <property name="text">
+    <string>新建</string>
+   </property>
+   <property name="toolTip">
+    <string>create a new tabfile</string>
+   </property>
+  </action>
+  <action name="open">
+   <property name="text">
+    <string>打开</string>
+   </property>
+   <property name="toolTip">
+    <string>open a file</string>
+   </property>
+  </action>
+  <action name="save">
+   <property name="text">
+    <string>保存</string>
+   </property>
+   <property name="toolTip">
+    <string>save current file</string>
+   </property>
+  </action>
+  <action name="find">
+   <property name="text">
+    <string>搜索</string>
+   </property>
+   <property name="toolTip">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic; color:#aaaa00;&quot;&gt;寻找字符&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F</string>
+   </property>
+  </action>
+  <action name="closeTab">
+   <property name="text">
+    <string>关闭标签</string>
+   </property>
+   <property name="toolTip">
+    <string>close current tab</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

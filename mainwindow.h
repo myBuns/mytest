@@ -7,6 +7,9 @@
 #include <QVector>
 #include "mytextedit.h"
 #include <QIcon>
+#include <QFontDialog>
+#include <QString>
+#include <QFont>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -33,6 +36,7 @@ private slots:
     void onCloseTab();
     void onOpenFile();
     void onSave();
+    void SetFontLabelStatus(const QFont font, const QString &string);//设置状态栏字体状态
 
 private:
     Ui::MainWindow *ui;

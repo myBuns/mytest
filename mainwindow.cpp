@@ -3,7 +3,6 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QVector>
-#include "addnum.h"
 #include <QByteArray>
 #include <QTextEdit>
 #include "mylabel.h"
@@ -15,7 +14,6 @@
 #include <QToolBar>
 #include <QHBoxLayout>
 #include <QPixmap>
-
 
 QVector<int> vec(50,0);
 MainWindow::MainWindow(QWidget *parent)
@@ -58,10 +56,16 @@ void MainWindow::InitUI()
     ui->tabWidget->addTab(textEdit,QString("tab%1").arg(++this->num));
     this->ConnectSignal(textEdit);
 
-    //初始化菜单栏
+    //初始化状态栏
     myLabel *label = new myLabel(ui->statusbar);
     connect(this,&MainWindow::strNum,label,&myLabel::setStrNum);
+    QLabel *FontLabel = new QLabel(ui->statusbar);
+    FontLabel->setObjectName("FontLabel");
+    this->SetFontLabelStatus(this->font(),this->fontInfo().family());
+
     ui->statusbar->addWidget(label);
+    ui->statusbar->addWidget(FontLabel);
+
 
     //action信号槽
     connect(ui->newfile,&QAction::triggered,this,&MainWindow::onNewFile);
@@ -90,7 +94,7 @@ void MainWindow::ConnectSignal(myTextEdit *edit)
     if(foundToolbar) {
         QObjectList btnList = foundToolbar->children();
         foreach (auto btnVar, btnList) {
-            qDebug() << btnVar->metaObject()->className();
+            //qDebug() << btnVar->metaObject()->className();
             if(btnVar->metaObject()->className() == QString("QPushButton").toStdString())
             {
                 QPushButton* btn = qobject_cast<QPushButton*>(btnVar);
@@ -171,6 +175,20 @@ void MainWindow::onSave()
             QMessageBox::information(nullptr, "Success", "File saved successfully.");
         } else {
             QMessageBox::warning(nullptr, "Error", "Failed to save file: " + file.errorString());
+        }
+    }
+}
+
+void MainWindow::SetFontLabelStatus(const QFont font, const QString &string)
+{
+    QObjectList list = this->statusBar()->children();
+
+    foreach (auto var, list) {
+        if(var->metaObject()->className() == QString("QLabel").toStdString())
+        {
+            QLabel *label = qobject_cast<QLabel*>(var);
+            label->setFont(font);
+            label->setText(string);
         }
     }
 }

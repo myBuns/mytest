@@ -32,8 +32,11 @@ myTextEdit::myTextEdit(QWidget *parent)
 
 myTextEdit::~myTextEdit()
 {
-    delete this->widget;
-    this->widget = nullptr;
+    if(this->widget != nullptr)
+    {
+//        delete this->widget;
+//        this->widget = nullptr;
+    }
 }
 
 void myTextEdit::newSeacherForm()
@@ -47,6 +50,11 @@ void myTextEdit::newSeacherForm()
 
 void myTextEdit::onBold()
 {
+    if(!this->textCursor().hasSelection())
+    {
+        return;
+    }
+
     QTextCursor cursor = this->textCursor();
     QTextCharFormat format = cursor.charFormat();
 
@@ -63,6 +71,11 @@ void myTextEdit::onBold()
 
 void myTextEdit::onItalic()
 {
+    if(!this->textCursor().hasSelection())
+    {
+        return;
+    }
+
     QTextCursor Cursor = this->textCursor();
     QTextCharFormat Format = Cursor.charFormat();
 
@@ -81,6 +94,11 @@ void myTextEdit::onItalic()
 
 void myTextEdit::onUnderline()
 {
+    if(!this->textCursor().hasSelection())
+    {
+        return;
+    }
+
     QTextCursor Cursor = this->textCursor();
     QTextCharFormat Format = Cursor.charFormat();
 

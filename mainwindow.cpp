@@ -12,9 +12,9 @@
 #include <QMessageBox>
 #include <QFileInfo>
 #include <QTextCodec>
-#include "mytextedit.h"
 #include <QToolBar>
 #include <QHBoxLayout>
+#include <QPixmap>
 
 
 QVector<int> vec(50,0);
@@ -34,28 +34,34 @@ MainWindow::~MainWindow()
 
 void MainWindow::InitUI()
 {
-    this->setWindowTitle(QString("Text check"));
-    //初始化tab
-    myTextEdit *textEdit = new myTextEdit(this);
-    connect(textEdit,&myTextEdit::textChanged,this,&MainWindow::CalaStrNum);
-    ui->tabWidget->addTab(textEdit,QString("tab%1").arg(++this->num));
+    //设置title
+    this->setWindowTitle(QString("Text Editor"));
+    this->setWindowIcon(QIcon("qrc:/buns.jpg"));
 
-    //初始化菜单栏
-    myLabel *label = new myLabel(ui->statusbar);
-    connect(this,&MainWindow::strNum,label,&myLabel::setStrNum);
-    ui->statusbar->addWidget(label);
 
     //初始化ToolBar
-    QToolBar *toolbar = new QToolBar(this);
-    QPushButton *bold = new QPushButton("加粗", toolbar);
-    QPushButton *italic = new QPushButton("斜体", toolbar);
-    QPushButton *underline = new QPushButton("underline", toolbar);
+    QToolBar* toolbar = new QToolBar(this);
+    toolbar->setObjectName("toolbar");
+    QPushButton *bold = new QPushButton("Bold", toolbar);
+    QPushButton *italic = new QPushButton("Italic", toolbar);
+    QPushButton *underline = new QPushButton("Underline", toolbar);
 
     toolbar->addWidget(bold);
     toolbar->addWidget(italic);
     toolbar->addWidget(underline);
 
     this->addToolBar(toolbar);
+
+    //初始化tab
+    myTextEdit *textEdit = new myTextEdit(this);
+    connect(textEdit,&myTextEdit::textChanged,this,&MainWindow::CalaStrNum);
+    ui->tabWidget->addTab(textEdit,QString("tab%1").arg(++this->num));
+    this->ConnectSignal(textEdit);
+
+    //初始化菜单栏
+    myLabel *label = new myLabel(ui->statusbar);
+    connect(this,&MainWindow::strNum,label,&myLabel::setStrNum);
+    ui->statusbar->addWidget(label);
 
     //action信号槽
     connect(ui->newfile,&QAction::triggered,this,&MainWindow::onNewFile);
@@ -76,6 +82,34 @@ void MainWindow::CalaStrNum()
 bool MainWindow::isAvail(int index)
 {
     return ui->tabWidget->tabText(index).contains("tab");
+}
+
+void MainWindow::ConnectSignal(myTextEdit *edit)
+{
+    QToolBar *foundToolbar = this->findChild<QToolBar*>("toolbar");
+    if(foundToolbar) {
+        QObjectList btnList = foundToolbar->children();
+        foreach (auto btnVar, btnList) {
+            qDebug() << btnVar->metaObject()->className();
+            if(btnVar->metaObject()->className() == QString("QPushButton").toStdString())
+            {
+                QPushButton* btn = qobject_cast<QPushButton*>(btnVar);
+                if(btn->text() == "Bold") {
+                    connect(btn,&QPushButton::clicked,edit,&myTextEdit::onBold);
+                }
+
+                if(btn->text() == "Underline")
+                {
+                    connect(btn,&QPushButton::clicked,edit,&myTextEdit::onUnderline);
+                }
+
+                if(btn->text() == "Italic")
+                {
+                    connect(btn,&QPushButton::clicked,edit,&myTextEdit::onItalic);
+                }
+            }
+        }
+    }
 }
 
 void MainWindow::onCloseTab()
@@ -146,4 +180,5 @@ void MainWindow::onNewFile()
     myTextEdit *textEdit = new myTextEdit(this);
     ui->tabWidget->addTab(textEdit,QString("tab%1").arg(++this->num));
     connect(textEdit,&myTextEdit::textChanged,this,&MainWindow::CalaStrNum);
+    this->ConnectSignal(textEdit);
 }

@@ -2,13 +2,99 @@
 #include <QMenu>
 #include <QAction>
 #include <QKeySequence>
+#include <QLineEdit>
+#include "seacherform.h"
 
 myTextEdit::myTextEdit(QWidget *parent)
     : QTextEdit(parent)
 {
-    //this->setFont();
-    this->setMouseTracking(true);
-    this->setFocusPolicy(Qt::StrongFocus);
+
+    // 创建上下文菜单
+    this->contextMenu = new QMenu(this);
+
+    // 添加默认的右键菜单操作
+    this->contextMenu->addActions(QTextEdit::createStandardContextMenu()->actions());
+
+    // 添加额外的操作
+    this->find = new QAction(this);
+    this->find->setEnabled(false);
+    this->find->setText("搜索");
+    this->find->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_F));
+    this->contextMenu->addAction(find);
+
+    connect(this->find,&QAction::triggered,this,&myTextEdit::newSeacherForm);
+    //connect(find,&QAction::changed,this,&myTextEdit::newSeacherForm);
+    connect(this,&myTextEdit::copyAvailable,this,[this](bool yes){
+        this->isAvailable = yes;
+        this->find->setEnabled(yes);
+    });
+}
+
+myTextEdit::~myTextEdit()
+{
+    delete this->widget;
+    this->widget = nullptr;
+}
+
+void myTextEdit::newSeacherForm()
+{
+    if (this->isAvailable) {
+        this->widget = new SeacherForm;
+        this->widget->setLineText(this->textCursor().selectedText());
+        this->widget->show();
+    }
+}
+
+void myTextEdit::onBold()
+{
+    QTextCursor cursor = this->textCursor();
+    QTextCharFormat format = cursor.charFormat();
+
+    // 检查当前是否已经应用了加粗样式
+    if (format.fontWeight() == QFont::Bold) {
+        format.setFontWeight(QFont::Normal); // 取消加粗样式
+    } else {
+        format.setFontWeight(QFont::Bold); // 应用加粗样式
+    }
+
+    cursor.mergeCharFormat(format);
+    this->mergeCurrentCharFormat(format);
+}
+
+void myTextEdit::onItalic()
+{
+    QTextCursor Cursor = this->textCursor();
+    QTextCharFormat Format = Cursor.charFormat();
+
+    if(Format.fontItalic())
+    {
+        Format.setFontItalic(false);
+    }
+    else
+    {
+        Format.setFontItalic(true);
+    }
+
+    Cursor.mergeCharFormat(Format);
+    this->mergeCurrentCharFormat(Format);
+}
+
+void myTextEdit::onUnderline()
+{
+    QTextCursor Cursor = this->textCursor();
+    QTextCharFormat Format = Cursor.charFormat();
+
+    if(Format.fontUnderline())
+    {
+        Format.setFontUnderline(false);
+    }
+    else
+    {
+        Format.setFontUnderline(true);
+    }
+
+    Cursor.mergeCharFormat(Format);
+    this->mergeCurrentCharFormat(Format);
 }
 
 void myTextEdit::wheelEvent(QWheelEvent *event)
@@ -36,25 +122,8 @@ void myTextEdit::wheelEvent(QWheelEvent *event)
 
 void myTextEdit::contextMenuEvent(QContextMenuEvent *event)
 {
-    // 创建上下文菜单
-    QMenu contextMenu(this);
-
-    // 添加默认的右键菜单操作
-    contextMenu.addActions(QTextEdit::createStandardContextMenu()->actions());
-
-    // 添加额外的操作
-    QAction *find = new QAction(this);
-    find->setText("搜索");
-    find->setShortcut(QKeySequence(QKeySequence::Find));
-    contextMenu.addAction(find);
-
-    connect(find,&QAction::changed,this,[](){
-        qDebug() << "dadada";
-    });
-
-
     // 显示上下文菜单
-    contextMenu.exec(event->globalPos());
+    this->contextMenu->exec(event->globalPos());
 }
 
 

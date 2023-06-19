@@ -13,18 +13,26 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     mylabel.cpp \
-    mytextedit.cpp
+    mytextedit.cpp \
+    seacherform.cpp
 
 HEADERS += \
     addnum.h \
     mainwindow.h \
     mylabel.h \
-    mytextedit.h
+    mytextedit.h \
+    seacherform.h
 
 FORMS += \
-    mainwindow.ui
+    mainwindow.ui \
+    seacherform.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+RESOURCES += \
+    rsc.qrc
+
+#ICON = C:\\Users\\worker\\Desktop\\mytest\\testProject\\buns.jpg

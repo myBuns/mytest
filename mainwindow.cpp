@@ -59,9 +59,12 @@ void MainWindow::InitUI()
     //初始化状态栏
     myLabel *label = new myLabel(ui->statusbar);
     connect(this,&MainWindow::strNum,label,&myLabel::setStrNum);
-    QLabel *FontLabel = new QLabel(ui->statusbar);
-    FontLabel->setObjectName("FontLabel");
+    QPushButton *FontLabel = new QPushButton(ui->statusbar);
+    FontLabel->setFlat(true);
     this->SetFontLabelStatus(this->font(),this->fontInfo().family());
+
+    //链接字体dialog
+    connect(FontLabel,&QPushButton::clicked,this,&MainWindow::ShowFontDialog);
 
     ui->statusbar->addWidget(label);
     ui->statusbar->addWidget(FontLabel);
@@ -184,13 +187,30 @@ void MainWindow::SetFontLabelStatus(const QFont font, const QString &string)
     QObjectList list = this->statusBar()->children();
 
     foreach (auto var, list) {
-        if(var->metaObject()->className() == QString("QLabel").toStdString())
+        if(var->metaObject()->className() == QString("QPushButton").toStdString())
         {
-            QLabel *label = qobject_cast<QLabel*>(var);
+            QPushButton *label = qobject_cast<QPushButton*>(var);
             label->setFont(font);
             label->setText(string);
         }
     }
+}
+
+void MainWindow::ShowFontDialog()
+{
+    QFontDialog *dialog = new QFontDialog;
+    dialog->exec();
+
+    connect(dialog,&QFontDialog::accepted,this,[=](){
+
+        QFontInfo info(dialog->currentFont());
+        qDebug() << info.family();
+//        myTextEdit *edit = qobject_cast<myTextEdit*>(this->ui->tabWidget->currentWidget());
+//        edit->setFont(font);
+    });
+
+    delete dialog;
+    dialog = nullptr;
 }
 
 void MainWindow::onNewFile()

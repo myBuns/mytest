@@ -19,6 +19,9 @@ public:
     void setLineText(const QString &str);
 
 private:
+    virtual void closeEvent(QCloseEvent *event);
+
+private:
     Ui::SeacherForm *ui;
 };
 

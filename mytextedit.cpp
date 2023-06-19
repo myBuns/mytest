@@ -32,20 +32,14 @@ myTextEdit::myTextEdit(QWidget *parent)
 
 myTextEdit::~myTextEdit()
 {
-    if(this->widget != nullptr)
-    {
-//        delete this->widget;
-//        this->widget = nullptr;
-    }
+
 }
 
 void myTextEdit::newSeacherForm()
 {
-    if (this->isAvailable) {
-        this->widget = new SeacherForm;
-        this->widget->setLineText(this->textCursor().selectedText());
-        this->widget->show();
-    }
+    this->widget = new SeacherForm;
+    this->widget->setLineText(this->textCursor().selectedText());
+    this->widget->showNormal();
 }
 
 void myTextEdit::onBold()

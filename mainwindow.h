@@ -37,6 +37,7 @@ private slots:
     void onOpenFile();
     void onSave();
     void SetFontLabelStatus(const QFont font, const QString &string);//设置状态栏字体状态
+    void ShowFontDialog();  //显示字体窗口
 
 private:
     Ui::MainWindow *ui;

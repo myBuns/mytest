@@ -1,5 +1,6 @@
 #include "seacherform.h"
 #include "ui_seacherform.h"
+#include <QCloseEvent>
 
 SeacherForm::SeacherForm(QWidget *parent) :
     QWidget(parent),
@@ -16,4 +17,10 @@ SeacherForm::~SeacherForm()
 void SeacherForm::setLineText(const QString &str)
 {
     ui->lineEdit->setText(str);
+}
+
+void SeacherForm::closeEvent(QCloseEvent *event)
+{
+    QWidget::closeEvent(event);
+    deleteLater(); // 释放内存
 }

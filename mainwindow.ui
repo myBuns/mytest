@@ -73,7 +73,8 @@
   </action>
   <action name="save">
    <property name="icon">
-    <iconset theme="dialog-error"/>
+    <iconset theme="dialog-error">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>另存为</string>
@@ -82,7 +83,7 @@
     <string>save current file</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+Shift+N</string>
+    <string>Ctrl+Shift+S</string>
    </property>
   </action>
   <action name="find">
@@ -105,6 +106,19 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+C</string>
+   </property>
+  </action>
+  <action name="savethis">
+   <property name="text">
+    <string>保存</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="saveall">
+   <property name="text">
+    <string>保存所有标签</string>
    </property>
   </action>
  </widget>

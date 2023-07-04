@@ -4,6 +4,7 @@
 #include <QKeySequence>
 #include <QLineEdit>
 #include "seacherform.h"
+#include <QShortcut>
 
 myTextEdit::myTextEdit(QWidget *parent)
     : QTextEdit(parent)
@@ -21,13 +22,16 @@ myTextEdit::myTextEdit(QWidget *parent)
     this->find->setText("搜索");
     this->find->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_F));
     this->contextMenu->addAction(find);
+    //设置快捷方式
+    QKeySequence sequeue = find->shortcut();
+    QShortcut *Shortcut = new QShortcut(sequeue,this);
 
     connect(this->find,&QAction::triggered,this,&myTextEdit::newSeacherForm);
-    //connect(find,&QAction::changed,this,&myTextEdit::newSeacherForm);
     connect(this,&myTextEdit::copyAvailable,this,[this](bool yes){
         this->isAvailable = yes;
         this->find->setEnabled(yes);
     });
+    connect(Shortcut,&QShortcut::activated,this,&myTextEdit::newSeacherForm);
 }
 
 myTextEdit::~myTextEdit()

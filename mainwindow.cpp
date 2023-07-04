@@ -10,10 +10,13 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QFileInfo>
-#include <QTextCodec>
 #include <QToolBar>
 #include <QHBoxLayout>
 #include <QPixmap>
+#include <QKeySequence>
+#include <QShortcut>
+#include <QThread>
+#include <QComboBox>
 
 QVector<int> vec(50,0);
 MainWindow::MainWindow(QWidget *parent)
@@ -21,6 +24,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
 
     this->InitUI();
 }
@@ -35,7 +39,6 @@ void MainWindow::InitUI()
     //设置title
     this->setWindowTitle(QString("Text Editor"));
     this->setWindowIcon(QIcon("qrc:/buns.jpg"));
-
 
     //初始化ToolBar
     QToolBar* toolbar = new QToolBar(this);
@@ -62,33 +65,45 @@ void MainWindow::InitUI()
     QPushButton *FontLabel = new QPushButton(ui->statusbar);
     FontLabel->setFlat(true);
     this->SetFontLabelStatus(this->font(),this->fontInfo().family());
+    QComboBox *comboBox = new QComboBox(ui->statusbar);
+
+    comboBox->addItem("UTF-8");
+    comboBox->addItem("ASCII");
+    comboBox->addItem("ISO-8859-1");
+
 
     //链接字体dialog
     connect(FontLabel,&QPushButton::clicked,this,&MainWindow::ShowFontDialog);
 
     ui->statusbar->addWidget(label);
     ui->statusbar->addWidget(FontLabel);
+    ui->statusbar->addWidget(comboBox);
 
+    QKeySequence sequeue = ui->savethis->shortcut();
+    QShortcut *shortcut = new QShortcut(sequeue, this);
 
     //action信号槽
     connect(ui->newfile,&QAction::triggered,this,&MainWindow::onNewFile);
     connect(ui->closeTab,&QAction::triggered,this,&MainWindow::onCloseTab);
     connect(ui->open,&QAction::triggered,this,&MainWindow::onOpenFile);
     connect(ui->save,&QAction::triggered,this,&MainWindow::onSave);
+    // 连接快捷方式的activated()信号到相应的槽函数
+    connect(shortcut, &QShortcut::activated, this,&MainWindow::onSavethis);
+
     //切换tab时统计字数
     connect(ui->tabWidget,&QTabWidget::currentChanged,this,&MainWindow::CalaStrNum);
-
 }
 
 void MainWindow::CalaStrNum()
 {
+    qDebug() << ui->tabWidget->currentIndex();
     myTextEdit *edit = qobject_cast<myTextEdit*>(ui->tabWidget->currentWidget());
     emit strNum(QString::number(edit->toPlainText().size()));
 }
 
 bool MainWindow::isAvail(int index)
 {
-    return ui->tabWidget->tabText(index).contains("tab");
+    return ui->tabWidget->tabText(index).contains(this->TableStr);
 }
 
 void MainWindow::ConnectSignal(myTextEdit *edit)
@@ -116,6 +131,27 @@ void MainWindow::ConnectSignal(myTextEdit *edit)
                 }
             }
         }
+    }
+}
+
+void MainWindow::SaveDataToFile(const QString &filePath)
+{
+    if (!filePath.isEmpty()) {
+        QFile file(filePath);
+        if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            QTextStream out(&file);
+            QTextCodec *codec = QTextCodec::codecForName("UTF-8");
+            out.setCodec(codec);
+            QString fileContent = qobject_cast<myTextEdit*>(ui->tabWidget->currentWidget())->toPlainText();
+            out << fileContent;
+            file.close();
+            QMessageBox::information(nullptr, "Success", "File saved successfully.");
+        } else {
+            QMessageBox::warning(nullptr, "Error", "Failed to save file: " + file.errorString());
+        }
+    }
+    else {
+        QMessageBox::warning(nullptr, "Error", "file is no exit: ");
     }
 }
 
@@ -162,23 +198,15 @@ void MainWindow::onOpenFile()
             QMessageBox::warning(nullptr, "Error", "Failed to open file: " + file.errorString());
         }
     }
-
+    this->filepathList.push_back(std::move(filePath));
 }
 
 void MainWindow::onSave()
 {
     QString filePath = QFileDialog::getSaveFileName(nullptr, "Save File", "", "Text Files (*.txt)");
-    if (!filePath.isEmpty()) {
-        QFile file(filePath);
-        if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-            QTextStream out(&file);
-            QString fileContent = qobject_cast<myTextEdit*>(ui->tabWidget->currentWidget())->toPlainText();
-            out << fileContent;
-            file.close();
-            QMessageBox::information(nullptr, "Success", "File saved successfully.");
-        } else {
-            QMessageBox::warning(nullptr, "Error", "Failed to save file: " + file.errorString());
-        }
+    if(filePath != "")
+    {
+        this->SaveDataToFile(filePath);
     }
 }
 
@@ -198,19 +226,34 @@ void MainWindow::SetFontLabelStatus(const QFont font, const QString &string)
 
 void MainWindow::ShowFontDialog()
 {
-    QFontDialog *dialog = new QFontDialog;
-    dialog->exec();
+    bool ret;
+    QFont font = QFontDialog::getFont(&ret);
+    if(ret)
+        ui->tabWidget->setFont(font);
+}
 
-    connect(dialog,&QFontDialog::accepted,this,[=](){
+void MainWindow::onSavethis()
+{
+    if(this->isAvail(ui->tabWidget->currentIndex()))
+    {
+        this->onSave();
+    }
+    else
+    {
+        QString filepath = this->ReturnFilePath(ui->tabWidget->tabText(ui->tabWidget->currentIndex()));
+        this->SaveDataToFile(filepath);
+    }
+}
 
-        QFontInfo info(dialog->currentFont());
-        qDebug() << info.family();
-//        myTextEdit *edit = qobject_cast<myTextEdit*>(this->ui->tabWidget->currentWidget());
-//        edit->setFont(font);
-    });
-
-    delete dialog;
-    dialog = nullptr;
+QString MainWindow::ReturnFilePath(QString fileName)
+{
+    foreach (QString var, this->filepathList) {
+        if( var.split("/").back() == fileName )
+        {
+            return var;
+        }
+    }
+    return QString("");
 }
 
 void MainWindow::onNewFile()

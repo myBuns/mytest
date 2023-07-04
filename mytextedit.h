@@ -23,7 +23,7 @@ public slots:
     void onItalic();
     void onUnderline();
 signals:
-
+    void fontFarmt(QFont font);
 private:
     virtual void wheelEvent(QWheelEvent *event);
     virtual void contextMenuEvent(QContextMenuEvent *event);

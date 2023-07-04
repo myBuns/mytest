@@ -18,10 +18,12 @@ public:
 
     void setLineText(const QString &str);
 
+private slots:
+    void onSeacher();
+
 private:
     virtual void closeEvent(QCloseEvent *event);
 
-private:
     Ui::SeacherForm *ui;
 };
 
